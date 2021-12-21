@@ -8,7 +8,8 @@ $.getJSON('data.json', function (result) {
     var id = params.get('id');
     if (!params.has('id') && !params.has('jw')) {
         // 默认ID
-        id = 'bfgw';
+        location.href = '/?id=bfgw';
+        return false;
     }
     if (id && result[id]) {
         showMap(result[id].lng, result[id].lat, result[id].name);
