@@ -1,0 +1,33 @@
+/* 箩筐地图 */
+body {
+    margin: 0;
+    font: 13px/1.5 "Microsoft YaHei", "Helvetica Neue", "Sans-Serif";
+}
+
+#map {
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+}
+
+#map .lkmap-ctrl-toolBar-lite {
+    margin: 0 34px 10px 0;
+}
+
+#map .lkmap-ctrl-compass-lite {
+    margin-right: 24px;
+}
+
+/* 自定义样式 */
+
+.json {
+    padding: 10%;
+    color: white;
+    height: 100%;
+    font-size: large;
+    font-weight: bold;
+}
+
+.LK-map-logo, .LK-map-logo-right {
+    display: none;
+}
