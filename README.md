@@ -6,7 +6,9 @@
 
 3. 将中心点坐标填写到 data.json 中，设定 id 即可。
 
-4. 访问 **map.chengyishu.net/?id=[id]** 即可。
+4. 指定 id 参数访问 **map.chengyishu.net/?id=[id]** 即可。
+
+   或者指定 jw 参数访问 **map.chengyishu.net/?jw=[经度],[维度]** 。
 
 5. 源代码来自于箩筐地图快速生成器的“获取代码”。
 

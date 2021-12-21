@@ -2,24 +2,30 @@ var map, mapCenter, layerData, layer, inforWindow;
 
 $.getJSON('data.json', function (result) {
     const params = new URLSearchParams(window.location.search);
+    // 指定经纬度
+    var lnglat = params.get('jw');
+    // 指定ID
     var id = params.get('id');
-    if (!id) {
-        // 默认中心定位北方购物
-        location.href = '/?id=bfgw';
+    if (!params.has('id') && !params.has('jw')) {
+        // 默认ID
+        id = 'bfgw';
     }
-    if (result[id]) {
-        $('title').text(result[id].name);
-        mapCenter = new LKMap.LngLat(result[id].lng, result[id].lat);
-        map = new LKMap.Map("map", {
-            center: mapCenter,
-            zoom: 14.1,
-        });
-        map.on('load', mapLoadFunction);
+    if (id && result[id]) {
+        showMap(result[id].lng, result[id].lat, result[id].name);
     } else {
-        // 显示全部中心定位
-        $('title').text('全部地点');
-        $('body').css('background', 'black');
-        $('body').html('<div class="json"><pre>' + JSON.stringify(result, null, 5) + '</pre></div>');
+        if (lnglat) {
+            lnglat = lnglat.split(',');
+            if (lnglat.length == 2 && lnglat[0] && lnglat[1]) {
+                title = '指定经度:' + lnglat[0] + ',指定纬度:' + lnglat[1];
+                showMap(lnglat[0], lnglat[1], title);
+            } else {
+                // 显示全部中心定位
+                showList(JSON.stringify(result, null, 5));
+            }
+        } else {
+            // 显示全部中心定位
+            showList(JSON.stringify(result, null, 5));
+        }
     }
 });
 
@@ -93,4 +99,20 @@ function createInforWindow() {
         content: ''
     });
 
+}
+
+function showMap(lng, lat, title) {
+    $('title').text(title);
+    mapCenter = new LKMap.LngLat(lng, lat);
+    map = new LKMap.Map("map", {
+        center: mapCenter,
+        zoom: 14.1,
+    });
+    map.on('load', mapLoadFunction);
+}
+
+function showList(json) {
+    $('title').text('全部坐标');
+    $('body').css('background', 'black');
+    $('body').html('<div class="json"><pre>' + json + '</pre></div>');
 }
