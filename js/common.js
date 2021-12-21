@@ -8,7 +8,7 @@ $.getJSON('data.json', function (result) {
         location.href = '/?id=bfgw';
     }
     if (result[id]) {
-        $('title').text($('title').text().replace('{{name}}', result[id].name));
+        $('title').text(result[id].name);
         mapCenter = new LKMap.LngLat(result[id].lng, result[id].lat);
         map = new LKMap.Map("map", {
             center: mapCenter,
@@ -17,7 +17,7 @@ $.getJSON('data.json', function (result) {
         map.on('load', mapLoadFunction);
     } else {
         // 显示全部中心定位
-        $('title').text($('title').text().replace('{{name}}', '全部地点'));
+        $('title').text('全部地点');
         $('body').css('background', 'black');
         $('body').html('<div class="json"><pre>' + JSON.stringify(result, null, 5) + '</pre></div>');
     }
