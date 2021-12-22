@@ -2,36 +2,38 @@ var map, mapCenter, layerData, layer, inforWindow;
 
 $.getJSON('data.json', function (result) {
     const params = new URLSearchParams(window.location.search);
-    // 指定经纬度
-    var lnglat = params.get('jw');
-    // 指定ID
-    var id = params.get('id');
-    if (!params.has('id') && !params.has('jw')) {
-        // 默认ID
-        location.href = '/?id=bfgw';
-        return false;
-    }
-    if (id && result[id]) {
-        showMap(result[id].lng, result[id].lat, result[id].name);
-    } else {
-        if (lnglat) {
-            lnglat = lnglat.split(',');
-            if (lnglat.length == 2 && lnglat[0] && lnglat[1]) {
-                title = '指定经度:' + lnglat[0] + ',指定纬度:' + lnglat[1];
-                showMap(lnglat[0], lnglat[1], title);
-            } else {
-                // 显示全部中心定位
-                showList(JSON.stringify(result, null, 5));
-            }
+    if (params.has('id')) {
+        // 指定ID
+        var id = params.get('id');
+        if (id && result[id]) {
+            // 指定ID可用
+            // 显示地图
+            showMap(result[id].lng, result[id].lat, result[id].name);
         } else {
-            // 显示全部中心定位
-            showList(JSON.stringify(result, null, 5));
+            // 指定ID不可用
+            // 显示全部位置
+            showList(result);
         }
+    } else if (params.has('jw')) {
+        // 指定经纬度
+        jw = params.get('jw').split(',');
+        if (jw.length == 2 && jw[0] && jw[1]) {
+            // 显示地图
+            title = '指定经度:' + jw[0] + ',指定纬度:' + jw[1];
+            showMap(jw[0], jw[1], title);
+        } else {
+            // 显示地图
+            showMap();
+        }
+    } else {
+        // 显示地图
+        showMap();
     }
 });
 
 function mapLoadFunction() {
     addOverLayer();
+    // 清除标记
     $('.LK-map-logo,.LK-map-logo-right').remove();
 }
 
@@ -73,7 +75,7 @@ function addOverLayer() {
                 });
                 break;
         }
-        if (layer) layer.on('click', clickLayerCallback)
+        if (layer) layer.on('click', clickLayerCallback);
     }
 }
 
@@ -102,18 +104,61 @@ function createInforWindow() {
 
 }
 
+// 显示地图
 function showMap(lng, lat, title) {
-    $('title').text(title);
-    mapCenter = new LKMap.LngLat(lng, lat);
-    map = new LKMap.Map("map", {
-        center: mapCenter,
-        zoom: 14.1,
-    });
-    map.on('load', mapLoadFunction);
+    if (lng && lat && title) {
+        // 显示指定位置
+        $('title').text(title);
+        mapCenter = new LKMap.LngLat(lng, lat);
+        map = new LKMap.Map("map", {
+            center: mapCenter,
+            zoom: 14.1,
+        });
+        map.on('load', mapLoadFunction);
+    } else {
+        // 显示当前位置
+        if(navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        }else{
+          alert("您的浏览器不支持使用 HTML 5 来获取地理位置服务。");
+        }
+    }
 }
 
-function showList(json) {
-    $('title').text('全部坐标');
+// 定位数据获取成功响应
+function onSuccess(position){
+    var lng = position.coords.longitude;
+    var lat = position.coords.latitude;
+    var title = '当前位置';
+    layerData = [{"type":"marker","name":title,"intro":title,"lnglat":{"lng":lng,"lat":lat}}];
+    showMap(lng, lat, title);
+}
+
+// 定位数据获取失败响应
+function onError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+        alert("您拒绝对获取地理位置的请求。");
+        break;
+    case error.POSITION_UNAVAILABLE:
+        alert("位置信息不可用。");
+        break;
+    case error.TIMEOUT:
+        alert("请求您的地理位置超时。");
+        break;
+    case error.UNKNOWN_ERROR:
+        alert("未知错误。请联系管理员。");
+        break;
+    default:
+        // 跳转到默认ID:北方购物
+        location.href = '/?id=bfgw';
+        break;
+  }
+}
+
+// 显示全部位置
+function showList(data) {
+    $('title').text('全部位置');
     $('body').css('background', 'black');
-    $('body').html('<div class="json"><pre>' + json + '</pre></div>');
+    $('body').html('<div class="json"><pre>' + JSON.stringify(data, null, 5) + '</pre></div>');
 }
